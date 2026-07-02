@@ -24,26 +24,26 @@ pub struct TrackID(pub u8);
 
 #[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Debug)]
 pub struct Pitch {
-    pub pitch: u8,
+    pub pitch: i16,
     pub tune: i16
 }
 
 impl Pitch {
     pub fn from_cents(cents: f32) -> Pitch {
         Pitch {
-            pitch: (cents / 100.).floor() as u8,
+            pitch: (cents / 100.).floor() as i16,
             tune: (cents % 100.) as i16
         }
     }
 
-    pub fn new(pitch: u8, tune: i16) -> Pitch {
+    pub fn new(pitch: i16, tune: i16) -> Pitch {
         Pitch { pitch, tune }.normalize()
     }
 
     pub fn normalize(&self) -> Pitch {
         let total_cents = self.cents();
         Pitch {
-            pitch: (total_cents / 100.).floor() as u8,
+            pitch: (total_cents / 100.).floor() as i16,
             tune: (total_cents % 100.) as i16
         }
     }
@@ -86,6 +86,7 @@ pub struct Note {
     pub time: Tick
 }
 
+/*
 impl Note {
     fn t0(&self) -> Note {
         Note {
@@ -97,6 +98,7 @@ impl Note {
         }
     }
 }
+*/
 
 #[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
 pub struct Sample {

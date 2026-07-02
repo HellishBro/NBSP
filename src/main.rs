@@ -36,16 +36,23 @@ async fn main_loop() {
     let maybe_handle = DeviceSinkBuilder::open_default_sink();
     let mixer = get_mixer(&maybe_handle);
 
-    let mut test_sample = Sample::from_file(include_bytes!(asset!("sounds/pling.ogg"))).unwrap();
+    let test_sample = Sample::from_file(include_bytes!(asset!("sounds/pling.ogg"))).unwrap();
+    let mut pitch = 0.;
+
+    let play_sound = |pitch| {
+        if let Some(mix) = &mixer {
+            mix.add(&test_sample.shift_pitch(pitch))
+        }
+    };
 
     loop {
         clear_background(Color::from_hex(0x000000));
 
-        if is_mouse_button_pressed(MouseButton::Left) {
-            if let Some(mix) = &mixer {
-                mix.add(&test_sample);
-                test_sample = test_sample.shift_pitch(100.);
-            }
+        let (left, right) = (is_mouse_button_pressed(MouseButton::Left), is_mouse_button_pressed(MouseButton::Right));
+        if left || right {
+            if left { pitch += 100. }
+            if right { pitch -= 100. }
+            play_sound(pitch);
         }
 
         draw_text(format!("FPS: {:.2}", 1. / get_frame_time()), 10., 25., 30., Color::from_hex(0xFFFFFF));
