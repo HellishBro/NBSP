@@ -24,6 +24,10 @@ fn main() {
                     medium: file_formats::bmp_fmt::to_rwmj_rgba::<{ 32 * 32 * 4 }>(include_bytes!(asset!("favicon/medium.bmp"))).unwrap(),
                     big: file_formats::bmp_fmt::to_rwmj_rgba::<{ 64 * 64 * 4 }>(include_bytes!(asset!("favicon/big.bmp"))).unwrap(),
                 }),
+                platform: miniquad::conf::Platform {
+                    swap_interval: Some(0),
+                    ..Default::default()
+                },
                 ..Default::default()
             },
             ..Default::default()
