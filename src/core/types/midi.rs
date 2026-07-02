@@ -15,11 +15,19 @@ pub struct PatternID(pub u8);
 
 #[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 #[serde(transparent)]
-pub struct Tick(pub usize);
+pub struct TrackID(pub u8);
 
 #[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 #[serde(transparent)]
-pub struct TrackID(pub u8);
+pub struct Tick(pub usize);
+
+impl Add for Tick {
+    type Output = Tick;
+    
+    fn add(self, rhs: Tick) -> Self::Output {
+        Tick(self.0 + rhs.0)
+    }
+}
 
 
 #[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Debug)]
@@ -129,6 +137,21 @@ pub struct PatternInstance {
     pub time: Tick,
     pub end_time: Option<Tick>,
     pub track: TrackID
+}
+
+impl PatternInstance {
+    pub fn duration(&self, pattern: &Pattern) -> Tick {
+        if let Some(end_time) = self.end_time {
+            end_time
+        } else {
+            let last_note = pattern.notes.iter().max_by_key(|note| note.time.0);
+            if let Some(last_note) = last_note {
+                last_note.time
+            } else {
+                Tick(0)
+            }
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Debug)]

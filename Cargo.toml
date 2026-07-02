@@ -1,13 +1,15 @@
 [package]
 name = "NBSP"
-description = "NBSP - Noteblock Studio Plus"
+description = "NBSP - NoteBlock Studio Plus"
 version = "0.0.1"
 edition = "2024"
 
 [dependencies]
 bmp = "0.5.0"
+cached = "2.0.2"
 chrono = "0.4.45"
 macroquad = "0.4.15"
 rodio = { version = "0.22.2", features = ["wav", "vorbis", "mp3", "flac"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
+slotmap = "1.1.1"

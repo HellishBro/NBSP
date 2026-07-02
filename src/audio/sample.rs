@@ -118,3 +118,34 @@ impl Sample {
         Sample::from_stereo(sample_rate, vec)
     }
 }
+
+impl<'a> IntoIterator for &'a Sample {
+    type Item = StereoFrame;
+    type IntoIter = SampleIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        SampleIterator {
+            sample: &self,
+            it: 0
+        }
+    }
+}
+
+pub struct SampleIterator<'a> {
+    sample: &'a Sample,
+    it: usize
+}
+
+impl<'a> Iterator for SampleIterator<'a> {
+    type Item = StereoFrame;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.it < self.sample.samples.len() {
+            let frame = self.sample.samples[self.it];
+            self.it += 1;
+            Some(frame)
+        } else {
+            None
+        }
+    }
+}
