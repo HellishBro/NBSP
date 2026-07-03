@@ -6,10 +6,14 @@ use crate::from_root;
 use cached::cached;
 use rodio::{ChannelCount, Sample as RodioSample, SampleRate, Source};
 use slotmap::{DefaultKey, SlotMap};
+use std::error::Error;
 use std::fs::File;
 use std::hash::{Hash, Hasher};
+use std::io::{BufWriter, Write};
 use std::num::NonZero;
 use std::time::Duration;
+use wavers::error::FormatError;
+use wavers::{FormatCode, Samples, WavHeader, DATA};
 
 const ROOT_DIR: &str = asset!("sounds");
 
@@ -57,6 +61,36 @@ impl<'a> SourceAudioRenderer<'a> {
             this_frame: Some(StereoFrame::default()),
             channel: 0
         }
+    }
+
+    pub fn wav_bytes(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
+        // adapted from wavers::write
+
+        let mut writer = BufWriter::new(Vec::new());
+        let me: Vec<f32> = self.collect();
+        let samples = Samples::from(me);
+        let samples_bytes = samples.as_bytes();
+        let new_header = WavHeader::new_header::<f32>(self.rend.sample_rate as i32, 2, samples.len())?;
+
+        match new_header.fmt_chunk.format {
+            FormatCode::WAV_FORMAT_PCM | FormatCode::WAV_FORMAT_IEEE_FLOAT => {
+                let header_bytes = new_header.as_base_bytes();
+                writer.write_all(&header_bytes)?;
+            }
+            FormatCode::WAVE_FORMAT_EXTENSIBLE => {
+                let header_bytes = new_header.as_extended_bytes();
+                writer.write_all(&header_bytes)?;
+            }
+            _ => {
+                return Err(FormatError::InvalidTypeId("Invalid type ID").into());
+            }
+        }
+
+        writer.write_all(&DATA)?;
+        let data_size_bytes = samples_bytes.len() as u32; // write up to the data size
+        writer.write_all(&data_size_bytes.to_ne_bytes())?; // write the data size
+        writer.write_all(&samples_bytes)?; // write the data
+        Ok(writer.get_ref().clone())
     }
 }
 

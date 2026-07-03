@@ -14,6 +14,7 @@ dependencies = [
  "serde",
  "serde_json",
  "slotmap",
+ "wavers",
 ]
 
 [[package]]
@@ -496,10 +497,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 
 [[package]]
-name = "hound"
-version = "3.5.1"
+name = "i24"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62adaabb884c94955b19907d60019f4e145d091c75345379e70d1ee696f7854f"
+checksum = "bafc62750bce7c2603750d1c19532e226bb85bd21f5385ab952cc29b8c31e2af"
+dependencies = [
+ "bytemuck",
+ "num-traits",
+]
 
 [[package]]
 name = "iana-time-zone"
@@ -950,6 +955,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "paste"
+version = "1.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
+
+[[package]]
 name = "pin-project-lite"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1057,7 +1068,6 @@ checksum = "d0a536bb79db59098ef71a4dd4246c02eb87b316deceb1b68e0cde7167ec01eb"
 dependencies = [
  "cpal",
  "dasp_sample",
- "hound",
  "num-rational",
  "rand",
  "rand_distr",
@@ -1484,6 +1494,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc1b4cb0cc549fcf58d7dfc081778139b3d283a081644e833e84682ad71cea24"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "wavers"
+version = "1.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d599ddd98c95ad3d3fc898cfb5c4023430f6ea62f96083f46d13cc8b82589bd3"
+dependencies = [
+ "bytemuck",
+ "i24",
+ "num-traits",
+ "paste",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
