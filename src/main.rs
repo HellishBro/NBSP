@@ -40,7 +40,7 @@ async fn main_loop() {
     let maybe_handle = DeviceSinkBuilder::open_default_sink();
     let mixer = get_mixer(&maybe_handle);
 
-    let test_sample = Sample::from_file(include_bytes!(asset!("sounds/pling.ogg"))).unwrap();
+    let test_sample = Sample::from_bytes(include_bytes!(asset!("sounds/pling.ogg"))).unwrap();
     let mut pitch = 0.;
 
     let play_sound = |pitch| {

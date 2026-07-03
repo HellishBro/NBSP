@@ -30,7 +30,7 @@ impl Add for Tick {
 }
 
 
-#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Debug, Hash)]
 pub struct Pitch {
     pub pitch: i16,
     pub tune: i16

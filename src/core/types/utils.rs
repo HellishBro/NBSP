@@ -12,9 +12,9 @@ impl Timestamp {
     }
 }
 
-impl Into<f64> for Timestamp {
-    fn into(self) -> f64 {
-        self.0
+impl From<Timestamp> for f64 {
+    fn from(value: Timestamp) -> f64 {
+        value.0
     }
 }
 
@@ -24,9 +24,9 @@ impl From<f64> for Timestamp {
     }
 }
 
-impl Into<DateTime<Utc>> for Timestamp {
-    fn into(self) -> DateTime<Utc> {
-        let (seconds, nanoseconds) = (self.0.floor() as i64, (self.0 % 1. * 1_000_000_000.) as u32);
-        DateTime::from_timestamp(seconds, nanoseconds).unwrap()
+impl From<Timestamp> for DateTime<Utc> {
+    fn from(value: Timestamp) -> DateTime<Utc> {
+        let (seconds, nanoseconds) = (value.0.floor() as i64, (value.0 % 1. * 1_000_000_000.) as u32);
+        DateTime::<Utc>::from_timestamp(seconds, nanoseconds).unwrap()
     }
 }

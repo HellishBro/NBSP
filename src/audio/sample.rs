@@ -41,9 +41,13 @@ impl Sample {
         )
     }
 
-    pub fn from_file(data: &'static [u8]) -> Result<Sample, Box<dyn ErrorT>> {
+    pub fn from_bytes(data: &'static [u8]) -> Result<Sample, Box<dyn ErrorT>> {
         let cursor = Cursor::new(data);
-        let decoder = Decoder::new(cursor)?;
+        Self::from_file_descriptor(cursor)
+    }
+    
+    pub fn from_file_descriptor<R: Read + Seek + Send + Sync + 'static>(data: R) -> Result<Sample, Box<dyn ErrorT>> {
+        let decoder = Decoder::new(data)?;
         match decoder.channels().get() {
             1 => Ok(Sample::from_mono_decoder(decoder)),
             2 => Ok(Sample::from_stereo_decoder(decoder)),
@@ -85,6 +89,14 @@ impl Sample {
         }
         Sample::from_stereo(self.sample_rate, res)
     }
+    
+    pub fn shift_volume(&self, volume: f32) -> Sample {
+        let mut res = Vec::<StereoFrame>::with_capacity(self.samples.len());
+        for pair in &self.samples {
+            res.push((pair.0 * volume, pair.1 * volume));
+        }
+        Sample::from_stereo(self.sample_rate, res)
+    }
 }
 
 impl Sample {
@@ -119,32 +131,41 @@ impl Sample {
     }
 }
 
-impl<'a> IntoIterator for &'a Sample {
+impl IntoIterator for Sample {
     type Item = StereoFrame;
-    type IntoIter = SampleIterator<'a>;
+    type IntoIter = SampleIterator;
 
     fn into_iter(self) -> Self::IntoIter {
         SampleIterator {
-            sample: &self,
-            it: 0
+            samples: self.samples,
+            it: 0,
+            done: false
         }
     }
 }
 
-pub struct SampleIterator<'a> {
-    sample: &'a Sample,
-    it: usize
+pub struct SampleIterator {
+    samples: Vec<StereoFrame>,
+    it: usize,
+    done: bool
 }
 
-impl<'a> Iterator for SampleIterator<'a> {
+impl SampleIterator {
+    pub fn is_done(&self) -> bool {
+        self.done
+    }
+}
+
+impl Iterator for SampleIterator {
     type Item = StereoFrame;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.it < self.sample.samples.len() {
-            let frame = self.sample.samples[self.it];
+        if self.it < self.samples.len() {
+            let frame = self.samples[self.it];
             self.it += 1;
             Some(frame)
         } else {
+            self.done = true;
             None
         }
     }
